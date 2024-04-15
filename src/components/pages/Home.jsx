@@ -1,9 +1,11 @@
 /* eslint-disable no-unused-vars */
 import axios from "axios";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { DataGlobalContext } from "../../context/GlobalContext.jsx";
 
 const Home = () => {
-  const [products, setProducts] = useState([]);
+  // const [products, setProducts] = useState([]);
+  const { products, setProducts } = useContext(DataGlobalContext);
   const [prev, setPrev] = useState(null);
   const [next, setNext] = useState(null);
   useEffect(() => {
@@ -17,6 +19,30 @@ const Home = () => {
 
       .catch((error) => console.log(error));
   }, []);
+
+  const handlePrevPage = () => {
+    if (prev) {
+      axios(`http://localhost:8080/api/products?page=${prev}`)
+        .then((res) => {
+          setProducts(res.data.docs);
+          setPrev(res.data.prevPage);
+          setNext(res.data.nextPage);
+        })
+        .catch((error) => console.log(error));
+    }
+  };
+
+  const handleNextPage = () => {
+    if (next) {
+      axios(`http://localhost:8080/api/products?page=${next}`)
+        .then((res) => {
+          setProducts(res.data.docs);
+          setPrev(res.data.prevPage);
+          setNext(res.data.nextPage);
+        })
+        .catch((error) => console.log(error));
+    }
+  };
 
   return (
     <main>
@@ -91,51 +117,25 @@ const Home = () => {
             })}
           </div>
 
-          {/* {{/each}} */}
-          <div
-            className="d-flex w-100 min-h-[250px] justify-content-center pt-20"
-            // style="padding-top: 60px;"
-          >
+          <div className="d-flex w-100 min-h-[250px] justify-content-center pt-20">
             <nav aria-label="Page navigation example">
               <ul className="pagination flex justify-center gap-36">
-                {/* {{#if pagesArray.hasPrevPage}} */}
                 {prev && (
                   <li className="page-item">
-                    {/* style="border-color: #121010;" */}
-                    <a
-                      className="page-link"
-                      href="?page={{pagesArray.prevPage}}"
-                      aria-label="Previous"
-                    >
-                      <span
-                        className="fw-bold pag"
-                        aria-hidden="true"
-                        // style="background-color: #e7e4d7; border-color: #121010;"
-                      >
+                    <button className="page-link" onClick={handlePrevPage}>
+                      <span className="fw-bold pag" aria-hidden="true">
                         Previous
                       </span>
-                    </a>
+                    </button>
                   </li>
                 )}
-
-                {/* {{/if}} */}
-
-                {/* {{#each pagesArray}} */}
-
-                {/* <li className="page-item {{#if isCurrent}}active{{/if}}"> */}
-                {/* <a className="page-link" href="?page={{pageNumber}}"></a> */}
-                {/* {{pageNumber}} */}
-                {/* </li> */}
-                {/* {{/each}} */}
-
-                {/* {{#if pagesArray.hasNextPage}} */}
                 {next && (
                   <li className="page-item">
-                    <a className="page-link" href="" aria-label="Next">
+                    <button className="page-link" onClick={handleNextPage}>
                       <span className="fw-bold" aria-hidden="true">
                         Next
                       </span>
-                    </a>
+                    </button>
                   </li>
                 )}
               </ul>
